@@ -21,7 +21,8 @@ def main(args):
     try:
         if not pylirc.init("firefox", "~/.lircrc", 1):
             return "Failed"
-        while True:
+        stop = False
+        while not stop:
             codes = pylirc.nextcode(1)
             if codes is None:
                 continue
@@ -30,11 +31,19 @@ def main(args):
                 if code is None:
                     continue
                 if code["config"] == "EXIT":
-                    return
+                    stop = True
+                    break
                 args = code["config"].split()
                 subprocess.Popen(["xdotool"] + args )
     except KeyboardInterrupt:
         print "Exiting...."
+    p1 = subprocess.Popen(["xdotool", "search", "--title", "Mozilla Firefox"], stdout = subprocess.PIPE)
+    p1.wait()
+    windows = p1.stdout.readline().split()
+    for window in windows:
+        print window
+        subprocess.Popen(["xdotool", "windowfocus", str(window)])
+        subprocess.Popen(["xdotool", "key", "ctrl+q"])
     return 0
 
 if __name__ == "__main__":
