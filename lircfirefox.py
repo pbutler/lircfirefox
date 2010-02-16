@@ -2,17 +2,21 @@
 # -*- coding: UTF-8 -*-
 # vim: ts=4 sts=4 sw=4 tw=79 sta et
 """
-Python source code - replace this with a description of the code and write the code below this text.
+An interface script for using lirc with Firefox, requires pylirc and xdotool
 """
 
 __author__  = 'Patrick Butler'
 __email__   = 'pbutler at killertux org'
 __license__ = "GPLv2"
+
 import subprocess
 import sys
 import pylirc
 
 def main(args):
+    """
+    Fires of firefox, then inits pylirc and waits for remote presses
+    """
     ffox = subprocess.Popen(["/usr/bin/firefox"] + args[1:])
     try:
         if not pylirc.init("firefox", "~/.lircrc", 1):
