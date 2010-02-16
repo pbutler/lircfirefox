@@ -2,6 +2,12 @@
 LIRC Firefox
 =============
 
+Author
+------
+
+Written By: Patrick Butler <pbutler killertux org> http://killertux.org
+These files are to be licensed under GPLv2
+
 Requirements
 ------------
 

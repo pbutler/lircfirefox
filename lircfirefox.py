@@ -5,9 +5,9 @@
 Python source code - replace this with a description of the code and write the code below this text.
 """
 
-__author__ = 'Patrick Butler'
-__email__  = 'pbutler@killertux.org'
-
+__author__  = 'Patrick Butler'
+__email__   = 'pbutler at killertux org'
+__license__ = "GPLv2"
 import subprocess
 import sys
 import pylirc
