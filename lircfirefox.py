@@ -12,6 +12,7 @@ __license__ = "GPLv2"
 import subprocess
 import sys
 import pylirc
+import time
 
 def main(args):
     """
@@ -41,9 +42,20 @@ def main(args):
     p1.wait()
     windows = p1.stdout.readline().split()
     for window in windows:
-        print window
+        #print "'%s'" % window
         subprocess.Popen(["xdotool", "windowfocus", str(window)])
         subprocess.Popen(["xdotool", "key", "ctrl+q"])
+
+    # If we found windows and they're still running  wait 3 seconds
+    if len(windows) != 0 and ffox.poll() is None:
+        for i in range(30):
+            time.sleep(.1)
+            if ffox.poll() is not None:
+                break
+    # Okay now we can forcibly kill it
+    if ffox.poll() is None:
+        ffox.terminate()
+
     return 0
 
 if __name__ == "__main__":
