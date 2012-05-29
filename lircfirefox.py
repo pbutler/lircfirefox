@@ -16,8 +16,20 @@ import time
 
 def main(args):
     """
-    Fires of firefox, then inits pylirc and waits for remote presses
+    Fires off firefox, then inits pylirc and waits for remote presses
     """
+    xstatus = subprocess.Popen(["xset", "-q"], stdout = subprocess.PIPE)
+    xstatus.wait()
+    has_dpms = any("DPMS is Enabled" in line for line in xstatus.stdout)
+    if has_dpms:
+        subprocess.Popen(["xset", "-dpms"])
+    try:
+        ffox(args)
+    finally:
+        if has_dpms:
+            subprocess.Popen(["xset", "+dpms"])
+
+def ffox(args):
     ffox = subprocess.Popen(["/usr/bin/firefox"] + args[1:])
     try:
         if not pylirc.init("firefox", "~/.lircrc", 1):
@@ -31,11 +43,18 @@ def main(args):
                 #print code
                 if code is None:
                     continue
-                if code["config"] == "EXIT":
+                config = code["config"].split()
+                if config[0] == "EXIT":
                     stop = True
                     break
-                args = code["config"].split()
-                subprocess.Popen(["xdotool"] + args )
+                if config[0] == "mousestepreset":
+                    mousestep = 0
+                elif config[0] == "mousemove_relative":
+                    if mousestep < 10:
+                        mousestep += 1
+                    config[2] = str(int(config[2]) * mousestep ** 2)
+                    config[3] = str(int(config[3]) * mousestep ** 2)
+                subprocess.Popen(["xdotool"] + config)
     except KeyboardInterrupt:
         print "Exiting...."
     p1 = subprocess.Popen(["xdotool", "search", "--title", "Mozilla Firefox"], stdout = subprocess.PIPE)
@@ -46,7 +65,7 @@ def main(args):
         subprocess.Popen(["xdotool", "windowfocus", str(window)])
         subprocess.Popen(["xdotool", "key", "ctrl+q"])
 
-    # If we found windows and they're still running  wait 3 seconds
+    # If we found windows and they're still running, wait 3 seconds
     if len(windows) != 0 and ffox.poll() is None:
         for i in range(30):
             time.sleep(.1)
